@@ -1,0 +1,101 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WanderLust</title>
+</head> -->
+
+<% layout('/layouts/boilerplate') -%>
+
+<!-- Pass latitude and longitude to map.js (Initialize Values) -->
+<script>
+    const latitude = 20.593684;         // Default set it to Centeral India's Coordintes
+    const longitude = 78.96288;
+    const address = "India";
+    const zoom = 4;
+    const draggableMarker = true;
+    const map_apiKey = "<%= process.env.MAP_API %>";  //for geocoding APIs
+</script>
+
+<div class="row ">
+    <div class="col-8  offset-2">
+        <body>
+            <h3 class="mb-4">Create a New Listing</h3>
+
+            <form method="POST" action="/listings" class="needs-validation" novalidate enctype="multipart/form-data">
+
+            <div class="mb-4">
+                <label for="title" class="form-label">Title</label>
+                <input class="form-control" type="text" name="listing[title]" placeholder="Add a catchy title" required> 
+                <div class="valid-feedback"> Title looks Good! </div>
+                <div class="invalid-feedback"> Please add a Title. </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" name="listing[description]" id="" placeholder="Description" required></textarea>
+                <div class="invalid-feedback"> Please add a short description. </div>
+            </div>
+
+            <div class="row">
+                <div class="mb-4 col-md-4">
+                    <label for="price" class="form-label">Price</label>
+                    <!-- To check the wrapAsync functionality we use below line -->
+                    <!-- <input class="form-control" type="text" name="listing[price]" placeholder="1200 / night" required> -->
+                    <input class="form-control" type="number" name="listing[price]" placeholder="1200 / night" required>
+                    <div class="invalid-feedback"> Invalid Price. </div>
+                </div>
+                <div class="mb-4 col-md-8">   
+                    <label for="country" class="form-label">Country</label>
+                    <input class="form-control" type="text" name="listing[country]" placeholder="India" required> 
+                    <div class="invalid-feedback"> Invalid Country. </div>
+                </div>
+            </div>
+            <!-- <div class="mb-4"> -->
+                <!-- <label for="image" class="form-label">Image Link</label> -->
+                <!-- <input class="form-control" type="text" name="listing{image}" placeholder="Enter image url"> -->
+                <!-- <input class="form-control" type="url" name="listing[image][url]" placeholder="Enter image url"> -->
+            <!-- </div> -->
+            <div class="mb-4">
+                <label for="image" class="form-label">Upload Image</label>
+                <input class="form-control" type="file" name="listing[image]" required>
+            </div>
+            <div class="mb-4">
+                <label for="location" class="form-label">Location</label>
+                <input class="form-control" type="text" name="listing[location]" placeholder="Vidhansabha, Delhi" required> 
+                <div class="invalid-feedback"> Invalid Location. </div>
+            </div>
+
+            <div class="mb-4">
+                <label for="coordinates" class="form-label">Select your exact location on map: </label>
+                <!-- Hidden Input to hold Coordinates -->
+                <input type="hidden" name="listing[coordinates]" id="coordinates" />
+                <!-- <input type="hidden" name="listing[coordinates]" /> -->
+
+                <div id="map"></div>
+            </div>
+
+                <br><br>
+                <!-- onClick function is defined in map.js for sending current location of marker with Listing data -->
+                <button class="btn btn-dark add-btn" onclick="fetchCurrentPosition(event)">Add</button>
+            </form>
+        
+            <!-- <br><br> <a href="/listings">All Listings</a> -->
+             
+            <!-- Form Validation Bootstrap -> OR write it on BoilerPlate -->  
+            <!-- <script src="/js/script.js"></script> -->
+
+
+                            
+            <!-- Leaflet and map functionality -->
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+            <!-- External JS for map -->
+            <script src="/js/map.js"></script>
+
+        </body>
+    </div>
+</div>
+
+<!-- </html> -->

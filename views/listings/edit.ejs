@@ -1,0 +1,110 @@
+
+<% layout('/layouts/boilerplate') -%>
+
+<!-- Pass latitude and longitude to map.js -->
+<script>
+    // const latitude = "<= listing.coordinates[0] %>";
+    // const longitude = "<= listing.coordinates[1] %>";
+    const latitude = <%= listing.coordinates && listing.coordinates[0] ? listing.coordinates[0] : 0 %>;
+    const longitude = <%= listing.coordinates && listing.coordinates[1] ? listing.coordinates[1] : 0 %>;
+    const address = "<%= listing.location %>, <%= listing.country %>";
+    const zoom = 14;
+    const draggableMarker = true;
+    const map_apiKey = "<%= process.env.MAP_API %>"; //for geocoding APIs
+</script>
+
+<div class="row">
+    <div class="col-8 offset-2">
+
+        <body>
+    
+            <h3 class="mb-4">Edit this Listing</h3>
+        
+            <form method="POST" action="/listings/<%=listing.id%>?_method=PUT" class="needs-validation" novalidate enctype="multipart/form-data">
+        
+                <!-- Title: <input type="text" name="listing[title]" value="<=listing.title%>"> <br> <br>
+                Description: <textarea name="listing[description]" id=""> <=listing.description%> </textarea>  <br> <br>
+                Price: <input type="number" name="listing[price]" value="<=listing.price%>"> <br> <br>
+                Image Url: <input type="text" name="listing{image}" value="<listing.image%>"> <br> <br>
+                Location: <input type="text" name="listing[location]" value="<=listing.location%>"> <br> <br>
+                Country: <input type="text" name="listing[country]" value="<=listing.country%>"> <br> <br> -->
+        
+                <div class="mb-4">
+                    <label for="title" class="form-label">Title</label>
+                    <input class="form-control" type="text" name="listing[title]" value="<%=listing.title%>" required> 
+                    <div class="valid-feedback"> Title looks Good! </div>
+                    <div class="invalid-feedback"> Please add a Title. </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" name="listing[description]" id="" required><%=listing.description%></textarea>
+                    <div class="invalid-feedback"> Please add a short description. </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-4 col-md-4">
+                        <label for="price" class="form-label">Price</label>
+                        <input class="form-control" type="number" name="listing[price]" value="<%=listing.price%>" required>
+                        <div class="invalid-feedback"> Invalid Price. </div>
+                    </div>
+                    <div class="mb-4 col-md-8">   
+                        <label for="country" class="form-label">Country</label>
+                        <input class="form-control" type="text" name="listing[country]" value="<%=listing.country%>" required> 
+                        <div class="invalid-feedback"> Invalid Country. </div>
+                    </div>
+                </div>
+
+                <!-- Image Preview -->
+                <div class="mb-4">
+                    <label class="mb-2">Original Listing Image</label> <br>
+                    <!-- <img src="<= previewImageURL %>" class="" alt="listing_img" > -->
+                    <img style="height: 250px;" src="<%= previewImageURL %>" class="" alt="listing_img" onerror="this.onerror=null; this.src='/icons/imageLoader.png';">
+                </div>
+
+                <!-- <div class="mb-4">
+                    <label for="image" class="form-label">Image Link</label>
+                    <input class="form-control" type="url" name="listing[image][url]" value="<%=listing.image.url%>" required>
+                </div> -->
+
+                <div class="mb-4">
+                    <label for="image" class="form-label">Upload New Image</label>
+                    <input class="form-control" type="file" name="listing[image]">
+                </div>
+
+                <div class="mb-4">
+                    <label for="location" class="form-label">Location</label>
+                    <input class="form-control" type="text" name="listing[location]"  value="<%=listing.location%>" required> 
+                    <div class="invalid-feedback"> Invalid Location. </div>
+                </div>
+
+                
+                <div class="mb-4">
+                    <label for="coordinates" class="form-label">Location on Map:</label>
+                    <!-- Hidden Input to hold Coordinates -->
+                    <!-- <input type="hidden" name="listing[coordinates]" id="coordinates" value=<=listing.coordinates%>/> -->
+                    <input type="hidden" name="listing[coordinates]" id="coordinates" />
+
+                    <div id="map"></div>
+                </div>
+            
+                <br><br>
+                <!-- onClick function is defined in map.js for sending current location of marker with Listing data -->
+                <button class="btn btn-dark edit-btn"  onclick="fetchCurrentPosition(event)">Save</button> 
+            </form>
+        
+            <!-- Form Validation Bootstrap / Imported from Boilerplate.ejs -->
+            <!-- <script src="/js/script.js"></script> -->
+
+                                                        
+            <!-- Leaflet and map functionality -->
+            <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+            <!-- External JS for map -->
+            <script src="/js/map.js"></script>
+            
+        </body>
+
+    </div>
+</div>
+
