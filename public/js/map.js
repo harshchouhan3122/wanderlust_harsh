@@ -45,8 +45,13 @@ const customIcon = L.icon({
 
 // Add a marker at the provided coordinates
 const marker = L.marker([lat, lng], { icon: customIcon, draggable: markerMove }).addTo(map);
+
 // Marker Popup
-marker.bindPopup(`<b>${locationAddress}</b>  <br>Drag marker to exact location.`).openPopup();
+if(markerMove) {
+    marker.bindPopup(`<b>${locationAddress}</b>  <br>Drag marker to exact location.`).openPopup();
+} else {
+    marker.bindPopup(`<b>${locationAddress}</b>`).openPopup();
+}
 
 // Function for Draggable Marker -> getting new coordinates from marker position
 marker.on('dragend', function(e) {
