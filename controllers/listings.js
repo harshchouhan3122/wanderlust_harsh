@@ -4,7 +4,7 @@ const Listing = require("../models/listing");
 module.exports.index = async (req, res, next) => {
     const allListings = await Listing.find({});
     // console.log(allListings);
-    console.log("All Listings from the DB...");
+    // console.log("All Listings from the DB...");
     // res.send(allListings);
     res.render("listings/index.ejs", {allListings});
 };
@@ -12,7 +12,7 @@ module.exports.index = async (req, res, next) => {
 // Render New Form for new Listing
 module.exports.renderNewForm = (req, res) => {
     res.render("listings/new.ejs");
-    console.log("Loading Form to Create new Listing...");
+    // console.log("Loading Form to Create new Listing...");
 };
 
 // Create Route (Save new Listing)
@@ -32,7 +32,7 @@ module.exports.addListing = async(req, res, next) => {
     const coordinates = JSON.parse(req.body.listing.coordinates);   // Should be { lat: ..., lng: ... }
     // console.log("Coordinates (after parsing):", coordinates);
 
-    // console.log(req.user);
+    console.log(`User Creating New Listing -> ${req.user}`);
     newListing.owner = req.user._id;        //current user is the owner of this new listing
     newListing.image = {url, filename};     // save the url and filename in mongoDB from Cloudinary
     newListing.coordinates = [coordinates.lat, coordinates.lng];;
@@ -69,12 +69,12 @@ module.exports.showListing = async (req, res, next) => {
         res.render("listings/show.ejs", {listing});
 
     } else{
-        console.log("Listing not found...");
+        // console.log("Listing not found...");
         req.flash("error", "Requested Listing not found !");
         res.redirect("/listings"); 
     }
 
-    console.log("Listing available...");
+    // console.log("Listing available...");
 };
 
 // Edit Route
@@ -88,11 +88,11 @@ module.exports.renderEditForm = async (req, res, next) => {
         let originalImageURL = listing.image.url;
         let previewImageURL = originalImageURL.replace("/upload", "/upload/c_fill,h_250");
 
-        console.log('Loading Form to Edit Listing......');
+        // console.log('Loading Form to Edit Listing......');
         res.render("listings/edit.ejs", {listing, previewImageURL});
 
     } else{
-        console.log("Listing not found...");
+        // console.log("Listing not found...");
         req.flash("error", "Requested Listing not found !");
         res.redirect("/listings"); 
     }
@@ -143,7 +143,7 @@ module.exports.updateListing = async(req, res, next) => {
 
     req.flash("success", "Listing Updated !");
     res.redirect(`/listings/${id}`);
-    console.log("Listing Edited and Updated Successfully...");
+    // console.log("Listing Edited and Updated Successfully...");
 };
 
 // Delete Route / Destroy Route
@@ -151,6 +151,7 @@ module.exports.deleteListing = async (req, res, next) => {
     let { id } = req.params;
     let result = await Listing.findByIdAndDelete(id);
     
+    console.log(`User Deleting Listing -> ${req.user}`);
     console.log(`Listing Deleted... -> ${result.title},${result.location},${result.country}`);
     req.flash("success", "Listing Deleted !")
     res.redirect('/listings');
