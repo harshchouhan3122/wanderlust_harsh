@@ -20,7 +20,7 @@
     
             <h3 class="mb-4">Edit this Listing</h3>
         
-            <form method="POST" action="/listings/<%=listing.id%>?_method=PUT" class="needs-validation" novalidate enctype="multipart/form-data">
+            <form id="ListingForm" method="POST" action="/listings/<%=listing.id%>?_method=PUT" class="needs-validation" novalidate enctype="multipart/form-data">
         
                 <!-- Title: <input type="text" name="listing[title]" value="<=listing.title%>"> <br> <br>
                 Description: <textarea name="listing[description]" id=""> <=listing.description%> </textarea>  <br> <br>

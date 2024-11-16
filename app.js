@@ -107,9 +107,10 @@ const userRouter = require("./routes/user.js");
 
 
 // Root Directory
-// app.get("/", (req, res)=>{
-//     res.send("Server is working....");
-// });
+app.get("/", (req, res)=>{
+    // res.send("Server is working....");
+    res.redirect("/listings");
+});
 
 
 

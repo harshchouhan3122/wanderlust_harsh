@@ -110,7 +110,7 @@ L.control.layers(baseLayers, overlays, {collapsed: true}).addTo(map);
 // Getting the current Position of the Marker and sending it to backend (for new and update Listing)
 
 function fetchCurrentPosition(event) {
-    event.preventDefault();     // Prevents form from submitting immediately
+    event.preventDefault(); // Prevent default form submission
 
     // Assuming currentLat and currentLng are set when the marker is moved
     console.log("Current Position: " + currentLat.toFixed(4) + " And " + currentLng.toFixed(4));
@@ -120,9 +120,16 @@ function fetchCurrentPosition(event) {
     geometryInput.value = JSON.stringify({ lat: currentLat, lng: currentLng });     //Convert Object to Sting before Sending to backend, At backend we will parse it to Object
     // console.log("Geometry object to submit:", geometryInput.value);
 
-    // Submit the form
-    document.querySelector('form').submit();
+    // Select the correct form by ID
+    const form = document.getElementById('ListingForm');
+    if (!form) {
+        console.error("Add Listing form not found!");
+        return;
+    }
+
+    form.submit(); // Submit the intended form
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -193,3 +200,4 @@ async function getCoordinates(address) {
 //     // Submit the form
 //     document.querySelector('form').submit();
 // }
+
