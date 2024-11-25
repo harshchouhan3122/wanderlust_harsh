@@ -11,6 +11,7 @@ body {
 
 
 /*   NAVBAR   */
+
 .navbar{
     height: 5rem;
     background-color: white;
@@ -61,30 +62,7 @@ body {
   color: #fff;
 }
 
-
-/* Responsive Navbar for mobile*/
-@media (max-width: 767px) {
-    .navbar-collapse {
-      background-color: #fff; /* Set your desired background color */
-      margin-top: 1rem;
-      border-bottom: 1px solid grey;
-    }
-    
-    .nav-search{
-        scale: 0.8;
-    }
-
-    .navbar-nav{ 
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .nav-link {
-      margin-bottom: 10px;
-    }
-}
+  
 
 /*   FOOTER   */
 
@@ -131,6 +109,13 @@ body {
 #filters{
     display: flex;
     gap: 1.5rem;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent wrapping of items */
+    padding: 10px;
+}
+
+#filters::-webkit-scrollbar {
+    display: none; /* Optional: Hide scrollbar for cleaner look */
 }
 
 .filter{
@@ -268,4 +253,35 @@ body {
     width: 100%;
     border: 1px solid rgb(175, 175, 175);
     border-radius: 4px;
+}
+
+
+
+
+
+
+/* For Mobile Screen*/
+
+@media (max-width: 767px) {
+    .navbar-collapse {
+      background-color: #fff; /* Set your desired background color */
+      margin-top: 1rem;
+      border-bottom: 1px solid grey;
+      margin-bottom: 1rem;
+    }
+    
+    .nav-search{
+        scale: 0.8;
+    }
+
+    .navbar-nav{ 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nav-link {
+      margin-bottom: 10px;
+    }
 }
