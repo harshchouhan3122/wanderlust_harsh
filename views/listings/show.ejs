@@ -12,13 +12,13 @@
 </script>
 
 <div class="row">
-    <div class="col-10 offset-3">
+    <div class="col-10 offset-1 offset-md-3">
 
         <body>
             <!-- <h3 class="mb-4"> Listing Details</h3> -->
             <h3 class="mb-4"> <%= listing.title %> </h3>
 
-            <div class="card col-md-7 show-card listing-card" >
+            <div class="card col-md-8 show-card listing-card" >
                 <!-- <a href="<%= listing.image.url %>" target="_blank">
                     <img src="<%= listing.image.url %>" class="card-img-top show-img" alt="listing_img">
                 </a> -->
@@ -43,8 +43,8 @@
             </div>
 
             <h5 class="mb-3">Location on Map: </h5>
-            <div class="row ms-1 col-7 mb-4">
-                <div id="map" style="height: 30vh;"></div>
+            <div class="row ms-1 mb-4">
+                <div class="col-md-8" id="map" style="height: 30vh;"></div>
             </div>
 
             <!-- <ul>
@@ -75,7 +75,7 @@
 
             <!-- Review Form -->
             <div class="row">
-                <div class="col-8">
+                <div class="col-md-8">
                     
                     <% if (currUser) { %>
                         <hr>
@@ -124,7 +124,7 @@
                         
                         <div class="row ms-1">
                             <% for(review of listing.reviews ) { %>
-                                <div class="card reviewCard col-5 m-1">
+                                <div class="card reviewCard col-md-5 m-1">
                                     <div class="card-body">
                                       <h6 class="card-subtitle mb-2 text-muted"> <i> @<%= review.createdBy.username %> </i> </h6>
                                       <p class="card-text starability-result" data-rating="<%= review.rating %>"> Rated: <%= review.rating %> stars</p>
