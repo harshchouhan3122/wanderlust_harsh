@@ -62,6 +62,30 @@ body {
 }
 
 
+/* Responsive Navbar for mobile*/
+@media (max-width: 767px) {
+    .navbar-collapse {
+      background-color: #fff; /* Set your desired background color */
+      margin-top: 1rem;
+      border-bottom: 1px solid grey;
+    }
+    
+    .nav-search{
+        scale: 0.8;
+    }
+
+    .navbar-nav{ 
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .nav-link {
+      margin-bottom: 10px;
+    }
+}
+
 /*   FOOTER   */
 
 .f-info-links a{
