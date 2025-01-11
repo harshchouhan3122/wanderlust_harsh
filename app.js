@@ -84,7 +84,7 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: true,
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        // secure: process.env.NODE_ENV === 'production',       //set true for https -> but free deployment services mostly offers http request
         expires: Date.now() + (7 * 24 * 60 * 60 * 1000), //for 1 week , this function returns in millisec
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
