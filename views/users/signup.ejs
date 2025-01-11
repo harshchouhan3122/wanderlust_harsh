@@ -1,38 +1,70 @@
 <% layout('/layouts/boilerplate') -%>
 
+
 <div class="row ">
     <div class="col-6  offset-3">
         <body>
             <h3 class="mb-4">SignUp on Wanderlust</h3>
+
+            <!-- Email and OTP verification button inside form -->
             <form method="POST" action="/signup" class="needs-validation" novalidate>
-        
-            <div class="mb-3">
-                <label for="username" class="form-label">Username</label>
-                <input class="form-control" id="username" type="text" name="username" placeholder="username" required> 
-                <div class="valid-feedback"> Username looks Good! </div>
-                <div class="invalid-feedback"> Username Required ! </div>
-            </div>
-        
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input class="form-control" type="email" id="email" name="email" placeholder="email" required> 
-                <!-- <div class="valid-feedback"> Email looks Good! </div> -->
-                <div class="invalid-feedback"> Email Required ! </div>
-            </div>
-        
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input class="form-control" type="password" id="password" name="password" placeholder="password" required> 
-                <!-- <div class="valid-feedback"> Password looks Good! </div> -->
-                <div class="invalid-feedback"> Password Required ! </div>
-            </div>
-
-
-
-                <br><br>
-                <button class="btn btn-dark add-btn">Sign up</button>
+                    <!-- Username -->
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input class="form-control" id="username" type="text" name="username" placeholder="Enter username" required> 
+                        <div class="valid-feedback"> Username looks good! </div>
+                        <div class="invalid-feedback"> Username is required! </div>
+                    </div>
+                
+                    <!-- Email -->
+                    <div class="row">
+                        <div class="mb-3 col-md-9">
+                            <label for="email" class="form-label">Email</label>
+                            <input class="form-control" type="email" id="email" name="email" placeholder="Enter email" required>
+                            <div class="invalid-feedback"> Email is required! </div>
+                        </div>
+                        <div class="mb-3 col-md-3 d-flex flex-column justify-content-end">
+                            <button class="btn btn-dark add-btn" type="button" id="sendOtpButton" onclick="sendOTP()">Send OTP</button>
+                        </div>
+                    </div>
+                
+                <!-- Password -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input class="form-control" type="password" id="password" name="password" placeholder="Enter password" required> 
+                    <div class="invalid-feedback"> Password is required! </div>
+                </div>
+            
+                <!-- Confirm Password -->
+                <div class="mb-3">
+                    <label for="cnf_password" class="form-label">Confirm Password</label>
+                    <input class="form-control" type="password" id="cnf_password" name="cnf_password" placeholder="Confirm password" required> 
+                    <div class="invalid-feedback"> Confirm password is required! </div>
+                </div>
+            
+                <!-- OTP Section (Initially hidden) -->
+                <div id="otpSection" style="display: none;">
+                    <div class="row d-flex">
+                        <div class="mb-3 col-md-4">
+                            <label for="otp" class="form-label">OTP</label>
+                            <input class="form-control" type="text" id="otp" name="otp" placeholder="Enter OTP" required> 
+                            <div class="invalid-feedback"> OTP is required! </div>
+                        </div>
+                        <div class="mb-3 col-md-3 d-flex flex-column justify-content-end">
+                            <button class="btn btn-dark add-btn" type="button" onclick="verifyOTP()">Verify OTP</button>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Signup Button -->
+                <button class="btn btn-dark add-btn mt-3" type="submit" disabled id="signupButton">Sign up</button>
             </form>
+
+
+            <!-- External JS for OTP for sending data from webPage form frontend to the backend -->
+            <script src="/js/otpVerification.js"></script>
 
         </body>
     </div>
 </div>
+

@@ -54,6 +54,7 @@ main().then(()=>{
 })
 .catch((err)=>{
     console.log(`Error Occurred: ${err}`)
+    process.exit(1); // Exit the server if DB connection fails
 })
 
 // sessions for auto login functionality
@@ -83,6 +84,7 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: true,
     cookie: {
+        secure: process.env.NODE_ENV === 'production',
         expires: Date.now() + (7 * 24 * 60 * 60 * 1000), //for 1 week , this function returns in millisec
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
@@ -158,6 +160,7 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
+app.use(express.json());
 
 
 // ERROR HANDELING
@@ -173,7 +176,7 @@ app.use((err, req, res, next) => {
     let { statusCode = 500, message="Something Went Wrong!!" } = err;
 
     console.log(`/// ERROR OCCURED ///  -> ${message}`);
-    // console.log(`ERROR OCCURED: ${err.stack}`);
+    console.log(`ERROR OCCURED: ${err.stack}`);
     res.status(statusCode).render("error.ejs", { err });
 });
 

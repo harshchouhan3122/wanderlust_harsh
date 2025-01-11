@@ -30,7 +30,7 @@ app.use(methodOverride("_method"));                             //for PUT reques
 app.engine("ejs", ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));       //for CSS styling
 
-
+app.use(express.json());                                        //for sending selected form data to backend
 
 // for index.ejs 
 app.set('view engine', 'ejs');
@@ -54,6 +54,7 @@ main().then(()=>{
 })
 .catch((err)=>{
     console.log(`Error Occurred: ${err}`)
+    // process.exit(1); // Exit the server if DB connection fails
 })
 
 // sessions for auto login functionality
@@ -83,6 +84,7 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: true,
     cookie: {
+        secure: process.env.NODE_ENV === 'production',
         expires: Date.now() + (7 * 24 * 60 * 60 * 1000), //for 1 week , this function returns in millisec
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
