@@ -28,7 +28,7 @@ const Review = require("./models/review.js");
 app.use(express.urlencoded({extended:true}))                    // to get the parameters from the query String 
 app.use(methodOverride("_method"));                             //for PUT request in UPDATE Route
 app.engine("ejs", ejsMate);
-app.use(express.static(path.join(__dirname, "/public")));       //for CSS styling
+app.use(express.static(path.join(__dirname, "/public")));       //for CSS styling, to serve public folder files globally accessable
 
 
 

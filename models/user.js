@@ -8,7 +8,15 @@ const userSchema = new Schema({
         type: String,
         required: true,
         unique: true,
-    }
+    },
+    registeredAt: {
+        type: Date,
+        required: true,
+    },
+    lastLoginAt: {
+        type: Date,
+        required: true,
+    },
 });
 
 // plugin to use auto functionality of hashing and salting of username and password

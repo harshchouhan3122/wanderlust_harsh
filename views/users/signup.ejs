@@ -29,17 +29,34 @@
                     </div>
                 
                 <!-- Password -->
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input class="form-control" type="password" id="password" name="password" placeholder="Enter password" required> 
                     <div class="invalid-feedback"> Password is required! </div>
+                </div> -->
+
+                <div class="mb-3 position-relative">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="position-relative">
+                        <input class="form-control" type="password" id="password" name="password" placeholder="Enter password" required >
+                        <button type="button" class="btn position-absolute end-0 top-0 h-100 toggle-password" data-target="#password" style="border: none; background: transparent; cursor: pointer;" >
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="invalid-feedback">Password is required!</div>
                 </div>
             
                 <!-- Confirm Password -->
-                <div class="mb-3">
+                <div class="mb-3 position-relative">
                     <label for="cnf_password" class="form-label">Confirm Password</label>
-                    <input class="form-control" type="password" id="cnf_password" name="cnf_password" placeholder="Confirm password" required> 
-                    <div class="invalid-feedback"> Confirm password is required! </div>
+                    <div class="position-relative">
+                        <input class="form-control" type="password" id="cnf_password" name="cnf_password" placeholder="Confirm password" required >
+                        <!-- UnComment below button to apply eye toggle button on confirm password also like password field -->
+                        <!-- <button type="button" class="btn position-absolute end-0 top-0 h-100 toggle-password" data-target="#cnf_password" style="border: none; background: transparent; cursor: pointer;" >
+                            <i class="fa fa-eye"></i>
+                        </button> -->
+                    </div>
+                    <div class="invalid-feedback">Confirm password is required!</div>
                 </div>
             
                 <!-- OTP Section (Initially hidden) -->
@@ -63,6 +80,58 @@
 
             <!-- External JS for OTP for sending data from webPage form frontend to the backend -->
             <script src="/js/otpVerification.js"></script>
+
+            <script>
+                // Wait for the DOM to load
+                document.addEventListener("DOMContentLoaded", () => {
+                    const passwordField = document.getElementById("password");
+                    const confirmPasswordField = document.getElementById("cnf_password");
+                    const signupButton = document.getElementById("signupButton");
+                
+                    // Function to check if passwords match
+                    function validatePasswords() {
+                        const password = passwordField.value;
+                        const confirmPassword = confirmPasswordField.value;
+                    
+                        // Check if passwords match
+                        if (password === confirmPassword) {
+                            confirmPasswordField.classList.remove("is-invalid");
+                            confirmPasswordField.classList.add("is-valid");
+                            // signupButton.disabled = false; // Enable the submit button
+                        } else {
+                            confirmPasswordField.classList.remove("is-valid");
+                            confirmPasswordField.classList.add("is-invalid");
+                            // signupButton.disabled = true; // Disable the submit button
+                        }
+                    }
+                
+                    // Add event listeners to the "Confirm Password" field
+                    confirmPasswordField.addEventListener("input", validatePasswords);
+                
+                    // Optional: Revalidate when typing in the password field
+                    passwordField.addEventListener("input", validatePasswords);
+                
+                    // Add event listeners to all toggle-password buttons
+                    const toggleButtons = document.querySelectorAll(".toggle-password");
+                
+                    toggleButtons.forEach(button => {
+                        button.addEventListener("click", () => {
+                            const targetId = button.getAttribute("data-target");
+                            const targetField = document.querySelector(targetId);
+                        
+                            // Toggle password visibility
+                            if (targetField.type === "password") {
+                                targetField.type = "text";
+                                button.innerHTML = '<i class="fa fa-eye-slash"></i>'; // Change icon
+                            } else {
+                                targetField.type = "password";
+                                button.innerHTML = '<i class="fa fa-eye"></i>'; // Change icon
+                            }
+                        });
+                    });
+                });
+            </script>
+            
 
         </body>
     </div>

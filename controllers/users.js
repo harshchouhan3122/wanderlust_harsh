@@ -10,11 +10,12 @@ module.exports.renderSignupForm = (req, res) => {
     res.render("./users/signup.ejs");
 };
 
-// Signup without generating OTP
+// Signup after generating OTP
 module.exports.signup = async (req, res) => {
     try {
         const { username, email, password } = req.body;
-        const newUser = new User({ email, username });
+        const { registeredAt, lastLoginAt } =  {registeredAt: Date.now(), lastLoginAt: Date.now()};
+        const newUser = new User({ email, username, registeredAt, lastLoginAt });
         let registeredUser = await User.register(newUser, password);     //to register new user, also checks the username is unique or not
         req.session.email = email; // Store email in session
         req.flash("success", "Welcome to WanderLust! Please verify your email.");
@@ -23,16 +24,28 @@ module.exports.signup = async (req, res) => {
         // Auto Login after Signup
         req.login(registeredUser, (err) => {
             if (err) {
+                // console.log(`Error from Backend: ${err}`)
                 return next(err);
             };
 
             req.flash("success", "Welcome to WanderLust!");
             // console.log(`User Registered Successfully! -> ${registeredUser.username}, ${registeredUser.email}, ${registeredUser.hash}`); //hash is a hashed password
+
             console.log(`User Registered Successfully! -> ${registeredUser.username}, ${registeredUser.email}`);
             res.redirect("/listings");
         });
-    } catch (e) {
-        req.flash("error", e.message);
+        
+    } 
+    catch (e) {
+
+        if (e.code === 11000) {                                     // Check for MongoDB duplicate key error code
+            const field = Object.keys(e.keyPattern)[0];             // Get the field causing the conflict
+            const errorMsg = `A user with this ${field} already exists.`;
+            req.flash("error", errorMsg);
+        } else {
+            req.flash("error", e.message);
+        }
+
         console.error(`Error -> ${e.message}`);
         res.redirect("/signup");
     }
@@ -135,15 +148,26 @@ module.exports.renderLoginForm = (req, res) => {
 //     // Redirect the user
 //     res.redirect(redirectUrl);
 // };
+
+// This function works after successfull authentication using passport.authenticate() in user.js -> routes
 module.exports.login = async(req, res) => {
     req.flash("success", "Welcome back to WanderLust !");
-    console.log("User Logged in Successfully!");
+    // console.log("User Logged in Successfully!");
     // res.redirect("/listings");
+
+    const { username } = req.body ;
+    console.log(`${username} -> Logged in Successfully!`)
+
+    // Update the login time at the backend
+    const user = await User.findOne({ username });
+    user.lastLoginAt = new Date();
+    await user.save();
 
     // let redirectUrl = req.locals.redirectUrl || "/listings";
     // console.log(res.session.redirectUrl);
-    console.log(res.locals.redirectUrl);
+    // console.log(res.locals.redirectUrl);
     let redirectUrl = res.locals.redirectUrl || "/listings";
+    // console.log(redirectUrl);
     res.redirect(redirectUrl);
 };
 
