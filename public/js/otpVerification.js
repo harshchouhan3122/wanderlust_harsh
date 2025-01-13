@@ -1,127 +1,100 @@
-const { response } = require("express");
+const { response } = require("express");  // Import response from express (not used here)
 
-
+// Function to send OTP
 function sendOTP() {
-    // const email = document.getElementById('email').value.trim(); // Trim to avoid leading/trailing spaces
-    const email = document.getElementById('email').value.trim();
-    const username = document.getElementById('username').value.trim();
-    // console.log("Email to be sent:", email); // Log the email value
-    // console.log("Username to be sent:", username); // Log the email value
-    // return;
-
-    // if (!username) {
-    //     alert("Please enter your name!");
-    //     return;
-    // }
-
-    // if (!email) {
-    //     alert("Please enter your email!");
-    //     return;
-    // }
-
-    // Check if the form is valid
-    // const form = document.querySelector('.needs-validation');
-    // if (!form.checkValidity()) {
-    //     form.classList.add('was-validated');
-    //     return; // Stop if the form is invalid
-    // }
+    const email = document.getElementById('email').value.trim();  // Get the email value and trim spaces
+    const username = document.getElementById('username').value.trim();  // Get the username value and trim spaces
 
     // Validation using Bootstrap
-        // Get the form and the email/username fields
-        const emailField = document.getElementById('email');
-        const usernameField = document.getElementById('username');
+    const emailField = document.getElementById('email');  // Get the email field element
+    const usernameField = document.getElementById('username');  // Get the username field element
     
-        // Reset previous validation states
-        emailField.classList.remove('is-invalid', 'is-valid');
-        usernameField.classList.remove('is-invalid', 'is-valid');
-        
-        let valid = true;
+    // Reset previous validation states
+    emailField.classList.remove('is-invalid', 'is-valid');  // Remove validation styles from email field
+    usernameField.classList.remove('is-invalid', 'is-valid');  // Remove validation styles from username field
     
-        // Validate username
-        if (!username) {
-            usernameField.classList.add('is-invalid');
-            valid = false;
-        } else {
-            usernameField.classList.add('is-valid');
-        }
+    let valid = true;  // Flag to track if both fields are valid
     
-        // Validate email
-        if (!email) {
-            emailField.classList.add('is-invalid');
-            valid = false;
-        } else {
-            emailField.classList.add('is-valid');
-        }
+    // Validate username
+    if (!username) {
+        usernameField.classList.add('is-invalid');  // Add invalid class if username is empty
+        valid = false;  // Set valid flag to false
+    } else {
+        usernameField.classList.add('is-valid');  // Add valid class if username is entered
+    }
     
-        // If the username or email is invalid, stop the process
-        if (!valid) {
-            return;
-        }
+    // Validate email
+    if (!email) {
+        emailField.classList.add('is-invalid');  // Add invalid class if email is empty
+        valid = false;  // Set valid flag to false
+    } else {
+        emailField.classList.add('is-valid');  // Add valid class if email is entered
+    }
+    
+    // If the username or email is invalid, stop the process
+    if (!valid) {
+        return;  // Exit if either field is invalid
+    }
 
+    // Send a POST request to the server with email and username in the body
     fetch('/send-otp', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        // body: JSON.stringify({ email }), // Send email in request body
-        body: JSON.stringify({ email, username }), // Send email in request body
+        body: JSON.stringify({ email, username }),  // Send email and username as JSON
     })
-        .then((response) => response.json())
+        .then((response) => response.json())  // Parse the JSON response
         .then((data) => {
             if (data.message === "OTP sent successfully!") {
-                alert("OTP sent to your email!");
-                document.getElementById('otpSection').style.display = 'block';
+                alert("OTP sent to your email!");  // Alert user if OTP is sent successfully
+                document.getElementById('otpSection').style.display = 'block';  // Show OTP input section
             } else {
-                alert(data.message || "Failed to send OTP. Try again.");
+                alert(data.message || "Failed to send OTP. Try again.");  // Alert if OTP sending fails
             }
         })
         .catch((err) => {
-            console.error("Error in fetch:", err);
-            alert("An error occurred. Please try again.");
+            console.error("Error in fetch:", err);  // Log error in case of fetch failure
+            alert("An error occurred. Please try again.");  // Alert user of error
         });
 }
 
-
-
+// Function to verify OTP
 function verifyOTP() {
-    const otp = document.getElementById("otp").value;
+    const otp = document.getElementById("otp").value;  // Get the entered OTP value
 
     if (!otp) {
-        alert("Please enter OTP!");
+        alert("Please enter OTP!");  // Alert user if OTP is empty
         return;
     }
 
+    // Send a POST request to verify the OTP
     fetch("/verify-otp", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({ otp }),
+        body: JSON.stringify({ otp }),  // Send OTP as JSON
     })
         .then((response) => {
-            // If the response is not okay, throw an error
             if (!response.ok) {
-                // Parse the response body and extract the message
+                // If response is not OK, throw an error with server message
                 return response.json().then((data) => {
-                    // Throw a custom error with the message from the server
-                    throw new Error(data.message || 'An error occurred');
+                    throw new Error(data.message || 'An error occurred');  // Throw error with message
                 });
             }
-            // If the response is OK, parse the response body
-            return response.json();
+            return response.json();  // Parse response if OK
         })
         .then((data) => {
-            alert(data.message);
+            alert(data.message);  // Alert user with response message
             if (data.message === "OTP verified successfully!") {
-                document.getElementById("signupButton").disabled = false; // Enable the signup button
-            }
-            else {
-                console.log(data.message);
+                document.getElementById("signupButton").disabled = false;  // Enable signup button after OTP verification
+            } else {
+                console.log(data.message);  // Log message if OTP verification fails
             }
         })
         .catch((err) => {
-            console.error("Error in verifyOTP fetch:", err);
-            // alert("An error occurred. Please try again.");
-            alert(err);
+            console.error("Error in verifyOTP fetch:", err);  // Log error in case of fetch failure
+            alert(err);  // Alert user of error
         });
 }

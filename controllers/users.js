@@ -1,183 +1,149 @@
-const User = require("../models/user");
-const sendEmail = require("../utils/sendEmail.js");
-const bcrypt = require("bcrypt");
+const User = require("../models/user"); // User model for managing user data
+const sendEmail = require("../utils/sendEmail.js"); // Utility to send OTP email
+const bcrypt = require("bcrypt"); // To hash the OTP for secure storage
 
 // OTP generator function
-const generateOTP = () => Math.floor(100000 + Math.random() * 900000);
+const generateOTP = () => Math.floor(100000 + Math.random() * 900000); // Generates a 6-digit OTP
 
 // Render Signup Form
 module.exports.renderSignupForm = (req, res) => {
-    res.render("./users/signup.ejs");
+    res.render("./users/signup.ejs"); // Renders the signup page
 };
 
 // Signup after generating OTP
 module.exports.signup = async (req, res) => {
     try {
+        // Destructure user details from the request body
         const { username, email, password } = req.body;
-        const { registeredAt, lastLoginAt } =  {registeredAt: Date.now(), lastLoginAt: Date.now()};
+        const { registeredAt, lastLoginAt } = { registeredAt: Date.now(), lastLoginAt: Date.now() };
+
+        // Create a new user instance and register the user
         const newUser = new User({ email, username, registeredAt, lastLoginAt });
-        let registeredUser = await User.register(newUser, password);     //to register new user, also checks the username is unique or not
-        req.session.email = email; // Store email in session
-        req.flash("success", "Welcome to WanderLust! Please verify your email.");
-        // res.redirect("/signup/verifyOTP");
+        let registeredUser = await User.register(newUser, password); // Registers the user and checks if the username is unique
         
+        // Store email in session
+        req.session.email = email; 
+        
+        // Send a flash message prompting email verification
+        req.flash("success", "Welcome to WanderLust! Please verify your email.");
+
         // Auto Login after Signup
         req.login(registeredUser, (err) => {
             if (err) {
-                // console.log(`Error from Backend: ${err}`)
-                return next(err);
-            };
+                return next(err); // Handle errors during login
+            }
 
             req.flash("success", "Welcome to WanderLust!");
-            // console.log(`User Registered Successfully! -> ${registeredUser.username}, ${registeredUser.email}, ${registeredUser.hash}`); //hash is a hashed password
-
             console.log(`User Registered Successfully! -> ${registeredUser.username}, ${registeredUser.email}`);
-            res.redirect("/listings");
+            res.redirect("/listings"); // Redirect to listings page after successful registration
         });
         
-    } 
-    catch (e) {
-
-        if (e.code === 11000) {                                     // Check for MongoDB duplicate key error code
-            const field = Object.keys(e.keyPattern)[0];             // Get the field causing the conflict
-            const errorMsg = `A user with this ${field} already exists.`;
+    } catch (e) {
+        // Handle errors during registration
+        if (e.code === 11000) { // Check for MongoDB duplicate key error code
+            const field = Object.keys(e.keyPattern)[0]; // Get the field causing the conflict
+            const errorMsg = `A user with this ${field} already exists.`; // Display appropriate error message
             req.flash("error", errorMsg);
         } else {
-            req.flash("error", e.message);
+            req.flash("error", e.message); // Flash error message for other types of errors
         }
 
         console.error(`Error -> ${e.message}`);
-        res.redirect("/signup");
+        res.redirect("/signup"); // Redirect back to signup page in case of error
     }
 };
 
 // Render OTP Verification Form
 module.exports.renderOTPForm = (req, res) => {
-    res.render("./users/verifyOTP.ejs");
+    res.render("./users/verifyOTP.ejs"); // Render the OTP verification page
 };
 
 // Send OTP
 module.exports.sendOTP = async (req, res) => {
-    const { email, username } = req.body;
-    // console.log("Request body:", req.body); // Log the request body
+    const { email, username } = req.body; // Destructure email and username from request body
 
+    // Check if username and email are provided
     if (!username) {
-        // console.log("Username is missing from the request body");
-        return res.status(400).json({ message: "Username is required" });
+        return res.status(400).json({ message: "Username is required" }); // Return error if username is missing
     }
 
     if (!email) {
-        // console.log("Email is missing from the request body");
-        return res.status(400).json({ message: "Email is required" });
+        return res.status(400).json({ message: "Email is required" }); // Return error if email is missing
     }
 
-    const otp = generateOTP();
-    const hashedOTP = await bcrypt.hash(otp.toString(), 10);        //Storig hashed OTP in Session Cookie
-    req.session.otp = hashedOTP;
-    req.session.otpGeneratedAt = Date.now();
+    const otp = generateOTP(); // Generate OTP
+    const hashedOTP = await bcrypt.hash(otp.toString(), 10); // Hash OTP before storing it in session
+
+    req.session.otp = hashedOTP; // Store hashed OTP in session
+    req.session.otpGeneratedAt = Date.now(); // Store OTP generation time
 
     try {
-        // console.log(`Sending OTP to: ${username} - ${email}, OTP: ${otp}`);
-        await sendEmail(email, username, otp); // Send email with OTP
-        // console.log("OTP sent successfully!");
-        res.status(200).json({ message: "OTP sent successfully!" });
+        // Send OTP email to user
+        await sendEmail(email, username, otp); 
+        res.status(200).json({ message: "OTP sent successfully!" }); // Respond with success message
     } catch (error) {
-        // console.error("Error while sending OTP:", error);
-        res.status(500).json({ message: "Failed to send OTP. Please try again." });
+        res.status(500).json({ message: "Failed to send OTP. Please try again." }); // Handle errors during OTP sending
     }
 };
 
-
-
 // Verify OTP
 module.exports.verifyOTP = async (req, res) => {
-    // console.log("Received request to verify OTP"); // Debug log
-    // console.log("Request body:", req.body); // Log request body
-
-    const { otp } = req.body;
+    const { otp } = req.body; // Destructure OTP from request body
 
     if (!req.session.otp) {
-        // console.error("No OTP found in session.");
-        return res.status(400).json({ message: "No OTP found in session. Please request a new one." });
+        return res.status(400).json({ message: "No OTP found in session. Please request a new one." }); // Handle case when OTP is not found in session
     }
 
-    const otpExpirationTime = 5 * 60 * 1000; // 5 minutes
+    const otpExpirationTime = 5 * 60 * 1000; // OTP expires after 5 minutes
 
     if (Date.now() - req.session.otpGeneratedAt > otpExpirationTime) {
-        // console.error("OTP has expired.");
-        return res.status(400).json({ message: "OTP has expired. Resend OTP." });
+        return res.status(400).json({ message: "OTP has expired. Resend OTP." }); // Handle expired OTP
     }
 
     try {
-        const isOTPValid = await bcrypt.compare(otp.toString(), req.session.otp);
+        const isOTPValid = await bcrypt.compare(otp.toString(), req.session.otp); // Compare provided OTP with the stored hashed OTP
         if (!isOTPValid) {
-            // console.error("Invalid OTP.");
-            return res.status(400).json({ message: "Invalid OTP. Resend OTP." });
+            return res.status(400).json({ message: "Invalid OTP. Resend OTP." }); // Handle invalid OTP
         }
 
         // Clear OTP after successful verification
         req.session.otp = null;
         req.session.otpGeneratedAt = null;
 
-        console.log("OTP verified successfully.");
-        return res.status(200).json({ message: "OTP verified successfully!" });
+        res.status(200).json({ message: "OTP verified successfully!" }); // OTP verified successfully
     } catch (err) {
-        console.error("Error in verifying OTP:", err);
-        return res.status(500).json({ message: "Server error. Please try again later." });
+        res.status(500).json({ message: "Server error. Please try again later." }); // Handle server errors
     }
 };
 
-
-
 // Render Login Form
 module.exports.renderLoginForm = (req, res) => {
-    res.render("./users/login.ejs");
+    res.render("./users/login.ejs"); // Render the login page
 };
 
+// Login after successful authentication
+module.exports.login = async (req, res) => {
+    req.flash("success", "Welcome back to WanderLust!"); // Flash message for successful login
 
-// Login
-// module.exports.login = (req, res) => {
-//     req.flash("success", "Welcome back to WanderLust!");
-    
-//     // Check for a redirect URL stored in the session (if any)
-//     const redirectUrl = req.session.redirectTo || "/listings"; 
-    
-//     // Clear the redirect URL from the session
-//     delete req.session.redirectTo; 
-    
-//     // Redirect the user
-//     res.redirect(redirectUrl);
-// };
+    const { username } = req.body;
+    console.log(`${username} -> Logged in Successfully!`);
 
-// This function works after successfull authentication using passport.authenticate() in user.js -> routes
-module.exports.login = async(req, res) => {
-    req.flash("success", "Welcome back to WanderLust !");
-    // console.log("User Logged in Successfully!");
-    // res.redirect("/listings");
-
-    const { username } = req.body ;
-    console.log(`${username} -> Logged in Successfully!`)
-
-    // Update the login time at the backend
+    // Update the login time in the backend for the logged-in user
     const user = await User.findOne({ username });
     user.lastLoginAt = new Date();
     await user.save();
 
-    // let redirectUrl = req.locals.redirectUrl || "/listings";
-    // console.log(res.session.redirectUrl);
-    // console.log(res.locals.redirectUrl);
-    let redirectUrl = res.locals.redirectUrl || "/listings";
-    // console.log(redirectUrl);
-    res.redirect(redirectUrl);
+    let redirectUrl = res.locals.redirectUrl || "/listings"; // Redirect URL after login (default to listings)
+    res.redirect(redirectUrl); // Redirect the user to the appropriate page after login
 };
 
 // Logout
 module.exports.logout = (req, res, next) => {
     req.logout((err) => {
         if (err) {
-            return next(err);
+            return next(err); // Handle errors during logout
         }
-        req.flash("success", "You are logged out!");
-        res.redirect("/listings");
+        req.flash("success", "You are logged out!"); // Flash message for successful logout
+        res.redirect("/listings"); // Redirect to listings page after logout
     });
 };
